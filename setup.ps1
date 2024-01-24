@@ -1,6 +1,6 @@
-New-Item ./src
+mkdir .\src
 
-cd ./src
+cd .\src
 
 py -m venv .venv
 
