@@ -95,15 +95,15 @@ def gradient_descent(x: np.ndarray, y: np.ndarray, w_in: float, b_in: float, cos
           primarily for graphing later
     """
     m = x.size
-    w = [w_in]
-    b = [b_in]
-    J_history = [cost_function(x, y, w[-1], b)]
+    w = w_in
+    b = b_in
+    J_history = [cost_function(x, y, w, b)]
     for i in range(1, num_iters):
-        (dj_dw, dj_db) = gradient_function(x, y, w[-1], b[-1])
-        total_cost = cost_function(x, y, w[-1], b[-1])
+        (dj_dw, dj_db) = gradient_function(x, y, w, b)
+        total_cost = cost_function(x, y, w, b)
 
-        w.append(w[-1] - (alpha * dj_dw))
-        b.append(b[-1] - (alpha * dj_db))
+        w = (w - (alpha * dj_dw))
+        b = (b - (alpha * dj_db))
 
         J_history.append(total_cost)
 
@@ -219,8 +219,8 @@ def write_results(J_history: np.ndarray, w: np.ndarray, b: np.ndarray) -> None:
     with open('./memoria/recursos/predicciones.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['Tam_poblacion', 'coste_predecido'])
-        writer.writerow([350, fun(35, w[-1], b[-1])])
-        writer.writerow([700, fun(70, w[-1], b[-1])])
+        writer.writerow([350, fun(35, w, b)])
+        writer.writerow([700, fun(70, w, b)])
 
 
 def show_J_history(J_history: np.ndarray) -> None:
@@ -256,10 +256,10 @@ def main():
     grid_data = make_grid([
         -1, 4], [-10, 10], x, y)
 
-    show_contour(grid_data, [w[-1], b[-1]], x, y)
+    show_contour(grid_data, [w, b], x, y)
     show_mesh(grid_data)
     show_J_history(J_history)
-    show_scatter_line(x, y, [w[-1], b[-1]])
+    show_scatter_line(x, y, [w, b])
 
     write_results(J_history, w, b)
 
