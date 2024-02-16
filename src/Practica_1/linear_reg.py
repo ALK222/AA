@@ -194,7 +194,7 @@ def show_scatter_line(x: np.ndarray, y: np.ndarray, wb: list[float]) -> None:
 
     plt.plot(x, y_vec, color='blue', label='prediccion')
 
-    plt.xlabel('tam. población (1000x)')
+    plt.xlabel('tam. población (10000x)')
     plt.ylabel('precio vivienda (1000$)')
 
     plt.savefig('./memoria/imagenes/scatter.png', dpi=300)
@@ -219,8 +219,8 @@ def write_results(J_history: np.ndarray, w: np.ndarray, b: np.ndarray) -> None:
     with open('./memoria/recursos/predicciones.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['Tam_poblacion', 'coste_predecido'])
-        writer.writerow([35, fun(35, w[-1], b[-1])])
-        writer.writerow([70, fun(70, w[-1], b[-1])])
+        writer.writerow([350, fun(35, w[-1], b[-1])])
+        writer.writerow([700, fun(70, w[-1], b[-1])])
 
 
 def show_J_history(J_history: np.ndarray) -> None:
