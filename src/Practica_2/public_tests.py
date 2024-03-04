@@ -25,7 +25,7 @@ def compute_gradient_test(target):
     X_train, y_train, w_init, b_init = test_data()
 
     dj_db, dj_dw = target(X_train, y_train, w_init, b_init)
-    #assert dj_dw.shape == w_init.shape, f"Wrong shape for dj_dw. {dj_dw} != {w_init.shape}"
+    # assert dj_dw.shape == w_init.shape, f"Wrong shape for dj_dw. {dj_dw} != {w_init.shape}"
 
     target_dj_db = -1.6739251122999121e-06
     target_dj_dw = [-2.73e-3, - 6.27e-6, - 2.22e-6, - 6.92e-5]
