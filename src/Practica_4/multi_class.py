@@ -1,9 +1,13 @@
+import copy
 import numpy as np
 import scipy.io as sio
 import utils
 import concurrent.futures
 import matplotlib.pyplot as plt
+import os
 import logistic_reg
+
+model_folder = "./models/"
 
 
 #########################################################################
@@ -135,6 +139,38 @@ def predict(theta1, theta2, X):
     return np.argmax(p, axis=1)
 
 
+def plot_confusion_matrix(y, p, filename):
+    fig, ax = plt.subplots()
+    ax.set_title("Confusion Matrix")
+    ax.set_xlabel("Predicted")
+    ax.set_xticks(np.arange(0, 10))
+    ax.set_yticks(np.arange(0, 10))
+    ax.set_ylabel("True")
+    cm = np.zeros((10, 10))
+    for i in range(len(y)):
+        cm[y[i] - 1][p[i] - 1] += 1
+    cax = ax.matshow(cm, cmap='Reds')
+    ax.set_xticks(np.arange(0, 10))
+    ax.set_yticks(np.arange(0, 10))
+    ax.set_yticks(np.arange(0.5, 10.5), minor='True')
+    ax.set_xticks(np.arange(0.5, 10.5), minor='True')
+    plt.grid(which='minor', color='lightgrey', linestyle='-', linewidth=0.5)
+    fig.colorbar(cax)
+    for (i, j), z in np.ndenumerate(cm):
+        if i == j:
+            ax.text(j, i, '{:0.1f}'.format(z),
+                    ha='center', va='center', fontsize=8, color='white')
+        else:
+            ax.text(j, i, '{:0.1f}'.format(z),
+                    ha='center', va='center', fontsize=8)
+    plt.savefig(filename, dpi=300)
+    plt.clf()
+
+
+def save_model(all_theta, filename):
+    sio.savemat(filename, {'all_theta': all_theta})
+
+
 def run_one_vs_all():
     data = sio.loadmat('./data/ex3data1.mat', squeeze_me=True)
     X = data['X']
@@ -142,9 +178,21 @@ def run_one_vs_all():
     m, n = X.shape
     num_labels = 10
     lambda_ = 0.01
-    all_theta = oneVsAll(X, y, num_labels, lambda_)
+    all_theta = []
+
+    if not os.path.isfile(model_folder + "one_vs_all_train.mat"):
+        all_theta = oneVsAll(X, y, num_labels, lambda_)
+        save_model(all_theta, model_folder + "one_vs_all_train.mat")
+    else:
+        aux = sio.loadmat(
+            f'{model_folder}one_vs_all_train.mat', squeeze_me=True)
+        all_theta = np.array(aux['all_theta'])
+        print(all_theta.shape)
+
     p = predictOneVsAll(all_theta, X)
     print((np.sum(np.array(p) == y) / m) * 100)
+    plot_confusion_matrix(y, p, logistic_reg.plot_folder +
+                          "confusion_matrix_one_vs_all.png")
 
 
 def run_neural_network():
@@ -157,6 +205,8 @@ def run_neural_network():
     p = predict(theta1.T, theta2.T, X)
 
     print((np.sum(np.array(p) == y) / m) * 100)
+    plot_confusion_matrix(
+        y, p, logistic_reg.plot_folder + "confusion_matrix_nn.png")
 
 
 def main():
