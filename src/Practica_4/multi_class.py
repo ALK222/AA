@@ -51,7 +51,7 @@ def train_all(X: np.ndarray, y: np.ndarray, n_labels: int, lambda_: float) -> tu
     all_theta = [0 for _ in range(n_labels)]
     predict_history = []
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [executor.submit(train_model, c, X, y, n_labels, lambda_)
+        futures = [executor.submit(train_model, c, X, y, lambda_)
                    for c in range(n_labels)]
         for future in concurrent.futures.as_completed(futures):
             c, (result, predict) = future.result()
@@ -254,7 +254,7 @@ def save_last_predictions(predict_all: np.ndarray) -> None:
         data = []
         for i in range(10):
             data.append(str(predict_all[i][-1]))
-        print(predict_all[-1].shape)
+
         csv_writer.writerow(data)
 
 
