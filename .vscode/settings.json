@@ -45,5 +45,6 @@
         "args": ["%DOCFILE%"]
       }
     ],
-    "cSpell.language": "en,es-ES,es"
+    "cSpell.language": "en,es-ES,es",
+    "cmake.configureOnOpen": false
   }
