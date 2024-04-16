@@ -10,7 +10,9 @@ import sys
 
 # Constants
 # Path to save the plots
-plot_folder = "./memoria/plots"
+plot_folder = "./memoria/images"
+# Path to save the csv files
+csv_folder = "./memoria/csv"
 # Random state for reproducibility
 RANDOM_STATE = 1
 
@@ -67,6 +69,24 @@ def draw_learning_curve(x: np.ndarray, y: np.ndarray, x_v: np.ndarray, y_v: np.n
     plt.plot(x, y, c='blue', label='train')
     plt.legend()
     plt.savefig(f'{plot_folder}/learning_curve.png', dpi=300)
+
+
+def write_csv(data: np.ndarray, name: str, split: int = 4) -> None:
+    """Writes a numpy array to a csv file
+
+    Args:
+        data (np.ndarray): data to write
+        name (str): name of the file
+        split (int, optional): number of columns to split the data. Defaults to 4.
+    """
+    np.printoptions(suppress=False)
+    # Format string to display numbers in scientific notation with 2 decimal places
+    fmt_float = '%.5e'
+    for i in range(1, len(data), split):
+        data_acc = np.concatenate((data[:, :1], data[:, i:i+split]), axis=1)
+
+        filename = f'{csv_folder}/{name}{i//split}.csv'
+        np.savetxt(filename, data_acc, delimiter=',', fmt=fmt_float)
 
 
 def gen_data(m: int, seed: int = 1, scale: float = 0.7) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -310,13 +330,15 @@ def seleccion_hiperparametros(x: np.ndarray, y: np.ndarray, x_i: np.ndarray, y_i
     min_cost: float = -1
     elec_lambda: float = 0
     eled_grado: int = 0
+    costs = np.empty((16, len(lambdas)))
 
-    for i in range(1, 15):
+    for i in range(1, 16):
         for l in lambdas:
             pol, scal, model, x_train_aux = train_reg(x_train, y_train, i, l)
             models[i][lambdas.index(l)] = (pol, scal, model, x_train_aux)
             cv_cost, train_cost = test(
                 x_cv, y_cv, x_train_aux, y_train, pol, scal, model)
+            costs[i][lambdas.index(l)] = cv_cost
             if min_cost == -1 or cv_cost < min_cost:
                 min_cost = cv_cost
                 elec_lambda = l
@@ -324,6 +346,10 @@ def seleccion_hiperparametros(x: np.ndarray, y: np.ndarray, x_i: np.ndarray, y_i
             print(f"Grado: {i} Lambda: {l}-> Cost: {cv_cost}")
     print(f"Grado seleccionado: {eled_grado}")
     print(f"Lambda seleccionado: {elec_lambda}")
+
+    costs = np.append(np.array(lambdas)[None, :], costs, axis=0)
+    costs = np.append(np.array(range(0, 17))[None, :], costs.T, axis=0)
+    write_csv(costs, 'hiperparametros')
 
     x_range: np.ndarray = np.linspace(np.min(x), np.max(x), 10000)
     x_range = x_range[:, None]
