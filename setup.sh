@@ -9,4 +9,4 @@ source .venv/bin/activate
 
 pip install pipreqs
 
-pip install -r ./requeriments.txt
+pip install -r ./requirements.txt
