@@ -2,7 +2,6 @@ import argparse
 
 
 class CommandLine:
-    interactive: bool = False
     plot: bool = False
     complex: bool = False
     simple: bool = False
@@ -13,8 +12,6 @@ class CommandLine:
     def __init__(self):
         self.parser = argparse.ArgumentParser(
             description='Practica 6 - Aprendizaje Automatico')
-        self.parser.add_argument('-I', "--Interactive",
-                                 help='Interactive mode', required=False, default="", action='store_true')
         self.parser.add_argument('-P', "--Plot", help='plots the data',
                                  required=False, default="", action='store_true')
         self.parser.add_argument('-C', "--Complex", help='runs complex model',
@@ -30,8 +27,6 @@ class CommandLine:
 
     def parse(self, sysargs):
         args = self.parser.parse_args(sysargs)
-        if args.Interactive:
-            self.interactive = True
         if args.Plot:
             self.plot = True
         if args.Complex:

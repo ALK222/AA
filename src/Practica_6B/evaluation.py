@@ -220,38 +220,39 @@ def plot_loss_accuracy(loss_hist: np.ndarray, accuracy_hist: np.ndarray, name: s
     ax.set_xlabel('Epoch', size=15)
     ax.tick_params(axis='both', which='major', labelsize=15)
     plt.tight_layout()
-    plt.savefig(f'{plot_folder}/{name}.png', dpi=300)
+    plt.savefig(f'{plot_folder}/{name}.png', dpi=150)
     plt.clf()
 
 
 def plot_decision_boundary(X_train: np.ndarray, Y_train: np.ndarray, X_cv: np.ndarray, Y_cv: np.ndarray, model: torch.nn.Sequential, name: str) -> None:
-    """Plots the decision boundary of a given model
-    Args:
-        X_train (np.ndarray): Training data
-        Y_train (np.ndarray): Training labels
-        X_cv (np.ndarray): Cross validation data
-        Y_cv (np.ndarray): Cross validation labels
-        model (torch.nn.Sequential): Model
-        name (str): name of the file inside the plot folder
-    """
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-    xx, yy = np.meshgrid(np.linspace(-3, 3, 100),
-                         np.linspace(-3, 3, 100))
+    datasets = [(X_train, Y_train, 'Training Data', cmap_dataset2,
+                 '.'), (X_cv, Y_cv, 'CV Data', cmap_dataset1, '<')]
 
-    Z = model(torch.from_numpy(np.c_[xx.ravel(), yy.ravel()]).float())
-    Z = torch.argmax(Z, dim=1).reshape(xx.shape)
+    for ax, (X, y, title, cmap, marker) in zip(axes, datasets):
+        mean = np.mean(X, axis=0)
+        std = np.std(X, axis=0)
+        X_normalized = (X - mean) / std
 
-    for ax, X, Y, title, cmap_dataset in zip(axes, [X_train, X_cv], [Y_train, Y_cv], ['Training data', 'Cross validation data'], [cmap_dataset2, cmap_dataset1]):
-        ax.set_title(title, size=15)
-        ax.set_xlabel('X0', size=15)
-        ax.set_ylabel('X1', size=15)
+        x_min, x_max = X_normalized[:, 0].min(
+        ) - 1, X_normalized[:, 0].max() + 1
+        y_min, y_max = X_normalized[:, 1].min(
+        ) - 1, X_normalized[:, 1].max() + 1
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.02),
+                             np.arange(y_min, y_max, 0.02))
+        Z = model(torch.tensor(np.c_[xx.ravel(), yy.ravel(
+        )], dtype=torch.float32)).detach().numpy().argmax(axis=1)
+        Z = Z.reshape(xx.shape)
 
-        ax.contour(xx, yy, Z, alpha=1, colors=['darkgreen'], linewidths=[2])
-        ax.scatter(X[:, 0], X[:, 1], c=Y, marker=".", cmap=cmap_dataset)
+        ax.contour(xx, yy, Z, alpha=0.8, colors=['darkgreen'])
+        ax.scatter(X_normalized[:, 0],
+                   X_normalized[:, 1], c=y, cmap=cmap, marker=marker)
+        ax.set_xlabel('Feature 1')
+        ax.set_ylabel('Feature 2')
+        ax.set_title(title)
 
     plt.tight_layout()
-    plt.savefig(f'{plot_folder}/{name}.png', dpi=300)
-    plt.clf()
+    plt.savefig(f'{plot_folder}/{name}.png', dpi=150)
 
 
 def evaluate_model(X_train: np.ndarray, y_train: np.ndarray, X_cv: np.ndarray, y_cv: np.ndarray, X_test: np.ndarray, y_test: np.ndarray, model: torch.nn.Sequential) -> dict[str, float]:
@@ -304,7 +305,7 @@ def plot_data(X_train: np.ndarray, y_train: np.ndarray, X_cv: np.ndarray, y_cv: 
     for circle in circles:
         plt.gca().add_artist(circle)
 
-    plt.savefig(f'{plot_folder}/{name}.png', dpi=300)
+    plt.savefig(f'{plot_folder}/{name}.png', dpi=150)
 
 
 def plot_regularization(train_error: np.ndarray, cv_error, labmbda_hist: np.ndarray, name: str) -> None:
@@ -321,7 +322,8 @@ def plot_regularization(train_error: np.ndarray, cv_error, labmbda_hist: np.ndar
     plt.xlabel('Lambda')
     plt.ylabel('Accuracy')
     plt.title('Regularization error')
-    plt.savefig(f'{plot_folder}/{name}.png', dpi=300)
+    plt.legend()
+    plt.savefig(f'{plot_folder}/{name}.png', dpi=150)
     plt.clf()
 
 
@@ -333,6 +335,7 @@ def generate_data_driver(commandLine: commandline.CommandLine) -> tuple[np.ndarr
         tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]: X_train, X_cv, X_test, y_train, y_cv, y_test
     """
     plt.clf()
+    print('Generating data')
     X, y, center = generate_data()
     X_train, X_cv, X_test, y_train, y_cv, y_test = train_split(X, y)
 
@@ -356,6 +359,7 @@ def simple_model_driver(X_train: np.ndarray, y_train: np.ndarray, X_cv: np.ndarr
     """
     plt.clf()
     if not os.path.exists(f'{plot_folder}/loss_accuracy_simple.png') or commandLine.all or commandLine.simple:
+        print('Simple model')
         model, loss_hist, accuracy_hist = simple_model(
             X_train, y_train)
         plot_loss_accuracy(loss_hist, accuracy_hist, 'loss_accuracy_simple')
@@ -378,6 +382,7 @@ def complex_model_driver(X_train: np.ndarray, y_train: np.ndarray, X_cv: np.ndar
     """
     plt.clf()
     if not os.path.exists(f'{plot_folder}/loss_accuracy_complex.png') or commandLine.all or commandLine.complex:
+        print('Complex model')
         model, loss_hist, accuracy_hist = complex_model(
             X_train, y_train)
         plot_loss_accuracy(loss_hist, accuracy_hist, 'loss_accuracy_complex')
@@ -400,6 +405,7 @@ def regularized_model_driver(X_train: np.ndarray, y_train: np.ndarray, X_cv: np.
     """
     plt.clf()
     if not os.path.exists(f'{plot_folder}/loss_accuracy_regularized.png') or commandLine.all or commandLine.regularized:
+        print('Regularized model')
         model, loss_hist, accuracy_hist = regularized_model(
             X_train, y_train, 0.1)
         plot_loss_accuracy(loss_hist, accuracy_hist,
@@ -413,6 +419,7 @@ def regularized_model_driver(X_train: np.ndarray, y_train: np.ndarray, X_cv: np.
 def reg_test_driver(X_train: np.ndarray, y_train: np.ndarray, X_cv: np.ndarray, y_cv: np.ndarray, X_test: np.ndarray, y_test: np.ndarray, commandLine: commandline.CommandLine) -> None:
     plt.clf()
     if not os.path.exists(f'{plot_folder}/tuning.png') or commandLine.all or commandLine.iter:
+        print('Regularized model with optimal lambda')
         _lambda_hist = np.array([0.0, 0.001, 0.01, 0.05, 0.1, 0.2, 0.3])
         error_hist_train = np.empty_like(_lambda_hist)
         error_hist_cv = np.empty_like(_lambda_hist)
@@ -421,11 +428,20 @@ def reg_test_driver(X_train: np.ndarray, y_train: np.ndarray, X_cv: np.ndarray, 
                 X_train, y_train, _lambda_hist[i])
             res = evaluate_model(X_train, y_train, X_cv,
                                  y_cv, X_test, y_test, model)
-            error_hist_train[i] = res['train']
-            error_hist_cv[i] = res['cv']
+            error_hist_train[i] = 1 - res['train']
+            error_hist_cv[i] = 1 - res['cv']
 
         plot_regularization(error_hist_train, error_hist_cv,
                             _lambda_hist, 'tuning')
+
+        opt = np.argmin(error_hist_cv)
+        print(f"Optimal lambda: {_lambda_hist[opt]}")
+        model, _, _ = regularized_model(
+            X_train, y_train, _lambda_hist[opt])
+        evaluate_model(X_train, y_train, X_cv, y_cv, X_test, y_test, model)
+        plt.title('Regularized model with optimal lambda')
+        plot_decision_boundary(X_train, y_train, X_cv, y_cv, model,
+                               'decision_boundary_regularized_optimal')
 
 
 def main():
