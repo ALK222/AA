@@ -1,6 +1,4 @@
 \documentclass[6pt]{../../shared/AiTex}
-\usepackage{csvsimple}
-\usepackage{pdflscape}
 
 \title{Memoria entrega 4}
 \author{A.L.K.}
@@ -50,7 +48,7 @@ Para dibujar estos datos usaremos la función \textit{plot\_data} (figura \ref{f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{./images/dataset.png}
+    \includegraphics[width=0.7\textwidth]{./images/dataset.png}
     \caption{Ejemplo del \textit{dataset}}
     \label{fig:digitos}
 \end{figure}
@@ -64,14 +62,14 @@ Para dibujar estos datos usaremos la función \textit{plot\_data} (figura \ref{f
 
 \begin{figure}[H]
     \centering
-    \lstinputlisting[firstline=296,lastline=316, style=custompython]{../evaluation.py}
+    \lstinputlisting[firstline=288,lastline=308, style=custompython]{../evaluation.py}
     \caption{Función \textit{plot\_data}}
     \label{fig:plot_data}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \lstinputlisting[firstline=338,lastline=353, style=custompython]{../evaluation.py}
+    \lstinputlisting[firstline=330,lastline=346, style=custompython]{../evaluation.py}
     \caption{Función \textit{generate\_data\_driver}}
     \label{fig:generate_data_driver}
 \end{figure}
@@ -149,7 +147,7 @@ La función \textit{acc} nos dice si una predicción es acertada o no y \textit{
 
 \begin{figure}[H]
     \centering
-    \lstinputlisting[firstline=378,lastline=397, style=custompython]{../evaluation.py}
+    \lstinputlisting[firstline=372,lastline=392, style=custompython]{../evaluation.py}
     \caption{Función \textit{complex\_model\_driver}}
     \label{fig:complex_model_driver}
 \end{figure}
@@ -163,7 +161,7 @@ La función \textit{acc} nos dice si una predicción es acertada o no y \textit{
 
 \begin{figure}[H]
     \centering
-    \lstinputlisting[firstline=266,lastline=293, style=custompython]{../evaluation.py}
+    \lstinputlisting[firstline=258,lastline=285, style=custompython]{../evaluation.py}
     \caption{Función \textit{evaluate\_model}}
     \label{fig:evaluate_model}
 \end{figure}
@@ -177,7 +175,7 @@ La función \textit{acc} nos dice si una predicción es acertada o no y \textit{
 
 \begin{figure}[H]
     \centering
-    \lstinputlisting[firstline=227,lastline=263, style=custompython]{../evaluation.py}
+    \lstinputlisting[firstline=227,lastline=255, style=custompython]{../evaluation.py}
     \caption{Función \textit{plot\_decision\_boundary}}
     \label{fig:plot_decision_boundary}
 \end{figure}
@@ -193,7 +191,7 @@ Podemos ver los resultados en \textit{train} y \textit{cross-validation} en la f
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{./images/decision_boundary_simple.png}
+    \includegraphics[width=0.7\textwidth]{./images/decision_boundary_simple.png}
     \caption{Resultados del modelo simple}
     \label{fig:simple_results}
 \end{figure}
@@ -207,7 +205,7 @@ Podemos ver los resultados en \textit{train} y \textit{cross-validation} en la f
 
 \begin{figure}[H]
     \centering
-    \lstinputlisting[firstline=356,lastline=375, style=custompython]{../evaluation.py}
+    \lstinputlisting[firstline=349,lastline=369, style=custompython]{../evaluation.py}
     \caption{Función \textit{simple\_model\_driver}}
     \label{fig:simple_model_driver}
 \end{figure}
@@ -242,14 +240,14 @@ Para regularizar este modelo usaremos la función \textit{train\_model} (figura 
 
 \begin{figure}[H]
     \centering
-    \lstinputlisting[firstline=400,lastline=420, style=custompython]{../evaluation.py}
+    \lstinputlisting[firstline=395,lastline=416, style=custompython]{../evaluation.py}
     \caption{Función \textit{regularized\_model\_driver}}
     \label{fig:regularized_model_driver}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{./images/decision_boundary_regularized.png}
+    \includegraphics[width=0.7\textwidth]{./images/decision_boundary_regularized.png}
     \caption{Modelo regularizado}
     \label{fig:regularized_results}
 \end{figure}
@@ -264,7 +262,7 @@ Obtenemos que el mejor valor de $\lambda$ es 0.01. Podemos ver el modelo regular
 
 \begin{figure}[H]
     \centering
-    \lstinputlisting[firstline=423,lastline=447, style=custompython]{../evaluation.py}
+    \lstinputlisting[firstline=419,lastline=444, style=custompython]{../evaluation.py}
     \caption{Función \textit{reg\_test\_driver}}
     \label{fig:reg_test_driver}
 \end{figure}
@@ -285,7 +283,7 @@ Obtenemos que el mejor valor de $\lambda$ es 0.01. Podemos ver el modelo regular
 
 \begin{figure}[H]
     \centering
-    \lstinputlisting[firstline=319,lastline=335, style=custompython]{../evaluation.py}
+    \lstinputlisting[firstline=311,lastline=327, style=custompython]{../evaluation.py}
     \caption{Función \textit{plot\_regularization}}
     \label{fig:plot_regularization}
 \end{figure}
