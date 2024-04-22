@@ -234,30 +234,21 @@ def plot_decision_boundary(X_train: np.ndarray, Y_train: np.ndarray, X_cv: np.nd
         model (torch.nn.Sequential): Model
         name (str): name of the file inside the plot folder
     """
-    fig = plt.figure(figsize=(12, 5))
-    ax = fig.add_subplot(1, 2, 1)
-    ax.scatter(X_train[:, 0], X_train[:, 1], c=Y_train,
-               marker=".", cmap=cmap_dataset2)
-    ax.set_xticks(range(-3, 4))
-    ax.set_yticks(range(-3, 4))
-    ax.set_title('Training data', size=15)
-    ax.set_xlabel('X0', size=15)
-    ax.set_ylabel('X1', size=15)
-    xx, yy = np.meshgrid(np.arange(-3, 3, 0.01),
-                         np.arange(-3, 3, 0.01))
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    xx, yy = np.meshgrid(np.linspace(-3, 3, 100),
+                         np.linspace(-3, 3, 100))
+
     Z = model(torch.from_numpy(np.c_[xx.ravel(), yy.ravel()]).float())
     Z = torch.argmax(Z, dim=1).reshape(xx.shape)
-    ax.contour(xx, yy, Z, alpha=1, colors=['darkgreen'], linewidths=[2])
-    ax = fig.add_subplot(1, 2, 2)
-    ax.scatter(X_cv[:, 0], X_cv[:, 1], c=Y_cv, marker="<", cmap=cmap_dataset1)
-    ax.set_title('Cross validation data', size=15)
-    ax.set_xlabel('X0', size=15)
-    ax.set_ylabel('X1', size=15)
-    xx, yy = np.meshgrid(np.arange(-3, 3, 0.01),
-                         np.arange(-3, 3, 0.01))
-    Z = model(torch.from_numpy(np.c_[xx.ravel(), yy.ravel()]).float())
-    Z = torch.argmax(Z, dim=1).reshape(xx.shape)
-    ax.contour(xx, yy, Z, alpha=1, colors=['darkgreen'], linewidths=[2])
+
+    for ax, X, Y, title, cmap_dataset in zip(axes, [X_train, X_cv], [Y_train, Y_cv], ['Training data', 'Cross validation data'], [cmap_dataset2, cmap_dataset1]):
+        ax.set_title(title, size=15)
+        ax.set_xlabel('X0', size=15)
+        ax.set_ylabel('X1', size=15)
+
+        ax.contour(xx, yy, Z, alpha=1, colors=['darkgreen'], linewidths=[2])
+        ax.scatter(X[:, 0], X[:, 1], c=Y, marker=".", cmap=cmap_dataset)
+
     plt.tight_layout()
     plt.savefig(f'{plot_folder}/{name}.png', dpi=300)
     plt.clf()
@@ -328,7 +319,7 @@ def plot_regularization(train_error: np.ndarray, cv_error, labmbda_hist: np.ndar
     plt.plot(labmbda_hist, cv_error, marker='o', linestyle='-',
              color='orange', label='CV error')
     plt.xlabel('Lambda')
-    plt.ylabel('Error')
+    plt.ylabel('Accuracy')
     plt.title('Regularization error')
     plt.savefig(f'{plot_folder}/{name}.png', dpi=300)
     plt.clf()
