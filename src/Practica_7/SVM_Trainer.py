@@ -7,7 +7,18 @@ import scipy.io as sio
 import concurrent.futures
 
 
-def train_model(C, sigma, x_train, y_train, x_cv, y_cv):
+def train_model(C: float, sigma: float, x_train: np.ndarray, y_train: np.ndarray, x_cv: np.ndarray, y_cv: np.ndarray) -> tuple[float, float, float]:
+    """Train the model with the given parameters
+    Args:
+        C (float): Regularization parameter
+        sigma (float): Gaussian kernel parameter
+        x_train (np.ndarray): Training data
+        y_train (np.ndarray): Training target
+        x_cv (np.ndarray): Cross validation data
+        y_cv (np.ndarray): Cross validation target
+    Returns:
+        tuple[float, float, float]: Regularization parameter, Gaussian kernel parameter, Score
+    """
     print(f'C: {C} sigma: {sigma}')
     svm_gauss = svm.SVC(kernel='rbf', C=C, gamma=1/(2*sigma**2))
     svm_gauss.fit(x_train, y_train.ravel())
@@ -15,7 +26,12 @@ def train_model(C, sigma, x_train, y_train, x_cv, y_cv):
     return (C, sigma, score)
 
 
-def trainer(X: np.ndarray, y: np.ndarray):
+def trainer(X: np.ndarray, y: np.ndarray) -> None:
+    """Trains the model with the given data
+    Args:
+        X (np.ndarray): Input data
+        y (np.ndarray): Target data
+    """
     C_values = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
     sigma_values = C_values
     x_train, x_test, y_train, y_test = train_test_split(

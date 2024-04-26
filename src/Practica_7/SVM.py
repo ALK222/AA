@@ -10,6 +10,7 @@ import SVM_Trainer
 import Logic_Regression_Trainer
 import nn_trainer
 import pytorch_trainer
+import Poly_trainer
 
 plot_folder: str = 'memoria/images'
 
@@ -47,12 +48,19 @@ def load_data3(file: str) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarra
 
 
 def kernel_linear(X: np.ndarray, y: np.ndarray, C: float) -> None:
-    svm_lineal = svm.SVC(kernel='linear',  C=C)
+    """Linear kernel
+
+    Args:
+        X (np.ndarray): X train dataa
+        y (np.ndarray): y train data
+        C (float): regularization parameter
+    """
+    svm_lineal: svm.SVC = svm.SVC(kernel='linear',  C=C)
     svm_lineal.fit(X, y.ravel())
-    x1 = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
-    x2 = np.linspace(X[:, 1].min(), X[:, 1].max(), 100)
+    x1: np.ndarray = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
+    x2: np.ndarray = np.linspace(X[:, 1].min(), X[:, 1].max(), 100)
     X1, X2 = np.meshgrid(x1, x2)
-    yp = svm_lineal.predict(
+    yp: np.ndarray = svm_lineal.predict(
         np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape)
     plt.contour(X1, X2, yp, colors='darkgreen', linewidths=1)
     plt.scatter(X[y.ravel() == 1, 0], X[y.ravel() == 1, 1], c='b', marker='x')
@@ -63,12 +71,19 @@ def kernel_linear(X: np.ndarray, y: np.ndarray, C: float) -> None:
 
 
 def kerner_gaussiano(X: np.ndarray, y: np.ndarray, C: float, sigma: float) -> None:
-    svm_gauss = svm.SVC(kernel='rbf', C=C, gamma=1/(2*sigma**2))
+    """Gaussian kernel
+    Args:
+        X (np.ndarray): X train dataa
+        y (np.ndarray): y train data
+        C (float): regularization parameter
+        sigma (float): scale parameter
+    """
+    svm_gauss: svm.SVC = svm.SVC(kernel='rbf', C=C, gamma=1/(2*sigma**2))
     svm_gauss.fit(X, y.ravel())
-    x1 = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
-    x2 = np.linspace(X[:, 1].min(), X[:, 1].max(), 100)
+    x1: np.ndarray = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
+    x2: np.ndarray = np.linspace(X[:, 1].min(), X[:, 1].max(), 100)
     X1, X2 = np.meshgrid(x1, x2)
-    yp = svm_gauss.predict(
+    yp: np.ndarray = svm_gauss.predict(
         np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape)
     plt.contour(X1, X2, yp, colors='darkgreen', linewidths=1)
     plt.scatter(X[y.ravel() == 1, 0], X[y.ravel() == 1, 1], c='b', marker='x')
@@ -79,11 +94,13 @@ def kerner_gaussiano(X: np.ndarray, y: np.ndarray, C: float, sigma: float) -> No
 
 
 def seleccion_sigma_C() -> None:
+    """Selects the best C and sigma for the gaussian kernel
+    """
     X, y, Xval, yval = load_data3('data/ex6data3.mat')
-    C_values = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
-    sigma_values = C_values
-    best_score = 0
-    best_params = (0, 0)
+    C_values: list[float] = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
+    sigma_values: list[float] = C_values
+    best_score: float = 0
+    best_params: tuple[float] = (0, 0)
     for C in C_values:
         for sigma in sigma_values:
             svm_gauss = svm.SVC(kernel='rbf', C=C, gamma=1/(2*sigma**2))
@@ -94,13 +111,13 @@ def seleccion_sigma_C() -> None:
                 best_params = (C, sigma)
     print(f'Best score: {best_score}')
     print(f'Best params: {best_params}')
-    svm_gauss = svm.SVC(
+    svm_gauss: svm.SVC = svm.SVC(
         kernel='rbf', C=best_params[0], gamma=1/(2*best_params[1]**2))
     svm_gauss.fit(X, y.ravel())
-    x1 = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
-    x2 = np.linspace(X[:, 1].min(), X[:, 1].max(), 100)
+    x1: np.ndarray = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
+    x2: np.ndarray = np.linspace(X[:, 1].min(), X[:, 1].max(), 100)
     X1, X2 = np.meshgrid(x1, x2)
-    yp = svm_gauss.predict(
+    yp: np.ndarray = svm_gauss.predict(
         np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape)
     plt.contour(X1, X2, yp, colors='darkgreen', linewidths=1)
     plt.scatter(X[y.ravel() == 1, 0], X[y.ravel() == 1, 1], c='b', marker='x')
@@ -110,7 +127,9 @@ def seleccion_sigma_C() -> None:
     plt.savefig(f'{plot_folder}/SVM_gauss_best.png', dpi=300)
 
 
-def apartado_A():
+def apartado_A() -> None:
+    """Apartado A
+    """
     X, y = load_data('data/ex6data1.mat')
     print("Linear kernel with C=1")
     kernel_linear(X, y, 1.0)
@@ -126,7 +145,9 @@ def apartado_A():
     seleccion_sigma_C()
 
 
-def load_data_spam():
+def load_data_spam() -> list[tuple[list[str], int]]:
+    """Loads the spam data
+    """
     modes:  list[str] = ['spam', 'easy_ham', 'hard_ham']
     cantidades: list[int] = [500, 2551, 250]
     spam_flag = [1, 0, 0]
@@ -150,8 +171,16 @@ def load_data_spam():
     return correos
 
 
-def transform_mail(correos, vocab):
+def transform_mail(correos, vocab) -> tuple[np.ndarray, np.ndarray]:
+    """Transforms the emails into a matrix of length of the vocabulary with 1 if the word is in the email
 
+    Args:
+        correos (_type_): mails
+        vocab (_type_): dictionary
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: transformed emails with label indicating if its spam or not
+    """
     X = []
     y = []
 
@@ -166,34 +195,86 @@ def transform_mail(correos, vocab):
     return np.array(X), np.array(y)
 
 
-def compare_results():
+def plot_results(train_scores: list[float], cv_scores: list[float], test_scores: list[float], times: list[float]) -> None:
+    """Plots the results
+    Args:
+        train_scores (list[float]): train scores
+        cv_scores (list[float]): cv scores
+        test_scores (list[float]): test scores
+        times (list[float]): times
+    """
+    plt.clf()
+    X: np.ndaarray = np.array(
+        ['Logistic Regression', 'SVM', 'NN', 'Pytorch', 'Poly'])
+    x = np.arange(len(X))
+    plt.bar(x-0.2,
+            train_scores, 0.2, label=f'Train')
+    plt.bar(x,
+            cv_scores, 0.2, label=f'CV')
+    plt.bar(x+0.2,
+            test_scores, 0.2, label=f'Test')
+    plt.legend()
+    plt.xticks(x, X)
+    plt.savefig(f'{plot_folder}/results.png', dpi=300)
+    plt.clf()
+    plt.plot(X, times)
+    plt.savefig(f'{plot_folder}/times.png', dpi=300)
+
+
+def compare_results() -> None:
+    """Compares the results of the different models
+    """
     lr_data = sio.loadmat('res/logistic_regression.mat')
     svm_data = sio.loadmat('res/svm.mat')
     nn_data = sio.loadmat('res/nn.mat')
     pytorch_data = sio.loadmat('res/pytorch.mat')
+    poly_data = sio.loadmat('res/poly.mat')
     print('Logistic Regression')
-    print(f"Score: {lr_data['score']}")
-    print(f"Best params: {lr_data['best_params']}")
-    print(f"Training time: {lr_data['time']}")
+    print(f"Score: {lr_data['train_score']}")
+    print(f"CV Score: {lr_data['cv_score']}")
+    print(f"Test Score: {lr_data['test_score']}")
+    print(f"Time: {lr_data['time']}")
+    print(f'Best params: {lr_data["best_params"]}')
     print('SVM')
-    print(f"Test score: {svm_data['test_score']}")
-    print(f"CV score: {svm_data['cv_score']}")
-    print(f"Train score: {svm_data['train_score']}")
-    print(f"Best params: {svm_data['best_params']}")
-    print(f"Training time: {svm_data['time']}")
+    print(f"Score: {svm_data['train_score']}")
+    print(f"CV Score: {svm_data['cv_score']}")
+    print(f"Test Score: {svm_data['test_score']}")
+    print(f"Time: {svm_data['time']}")
+    print(f'Best params: {svm_data["best_params"]}')
     print('NN')
-    print(f"Score: {nn_data['score']}")
-    print(f"Best params: {nn_data['best_params']}")
-    print(f"Training time: {nn_data['time']}")
+    print(f"Score: {nn_data['train_score']}")
+    print(f"CV Score: {nn_data['cv_score']}")
+    print(f"Test Score: {nn_data['test_score']}")
+    print(f"Time: {nn_data['time']}")
+    print(f'Best params: {nn_data["best_params"]}')
     print('Pytorch')
-    print(f"Test score: {pytorch_data['test_score']}")
-    print(f"CV score: {pytorch_data['cv_score']}")
-    print(f"Train score: {pytorch_data['train_score']}")
-    print(f"Best params: {pytorch_data['best_params']}")
-    print(f"Training time: {pytorch_data['time']}")
+    print(f"Score: {pytorch_data['train_score']}")
+    print(f"CV Score: {pytorch_data['cv_score']}")
+    print(f"Test Score: {pytorch_data['test_score']}")
+    print(f"Time: {pytorch_data['time']}")
+    print(f'Best params: {pytorch_data["best_params"]}')
+    print('Poly')
+    print(f"Score: {poly_data['train_score']}")
+    print(f"CV Score: {poly_data['cv_score']}")
+    print(f"Test Score: {poly_data['test_score']}")
+    print(f"Time: {poly_data['time']}")
+    print(f'Best params: {poly_data["best_params"]}')
+
+    train_scores = [lr_data['train_score'][0][0], svm_data['train_score']
+                    [0][0], nn_data['train_score'][0][0], pytorch_data['train_score'][0][0], poly_data['train_score'][0][0]]
+    cv_scores = [lr_data['cv_score'][0][0], svm_data['cv_score']
+                 [0][0], nn_data['cv_score'][0][0], pytorch_data['cv_score'][0][0], poly_data['cv_score'][0][0]]
+    test_scores = [lr_data['test_score'][0][0], svm_data['test_score']
+                   [0][0], nn_data['test_score'][0][0], pytorch_data['test_score'][0][0], poly_data['test_score'][0][0]]
+    times = [lr_data['time'][0][0], svm_data['time'][0][0],
+             nn_data['time'][0][0], pytorch_data['time'][0][0], poly_data['time'][0][0]]
+    print(train_scores)
+    plot_results(train_scores, cv_scores, test_scores, times)
 
 
 def apartado_B():
+    """Apartado B
+    """
     correos = load_data_spam()
     vocab = getVocabDict()
     X, y = transform_mail(correos, vocab)
@@ -209,11 +290,14 @@ def apartado_B():
     if not os.path.exists(f'res/nn.mat'):
         print('Training NN')
         nn_trainer.trainer(X, y)
+    if not os.path.exists(f'res/poly.mat'):
+        print('Training Poly')
+        Poly_trainer.trainer(X, y)
 
     compare_results()
 
 
-def main():
+def main() -> None:
     apartado_A()
     apartado_B()
 
