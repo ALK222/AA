@@ -11,6 +11,11 @@ import Logic_Regression_Trainer
 import nn_trainer
 import pytorch_trainer
 import Poly_trainer
+import torch.nn as nn
+import torch.optim as optim
+import torch
+from sklearn.metrics import accuracy_score
+from pytorch_trainer import ComplexModel, train_data, train_model, pred_check, device
 
 plot_folder: str = 'memoria/images'
 
@@ -297,9 +302,104 @@ def apartado_B():
     compare_results()
 
 
+def Pruebas():
+    correos = load_data_spam()
+    vocab = getVocabDict()
+    X, y = transform_mail(correos, vocab)
+    lr_data = sio.loadmat('res/logistic_regression.mat')
+    svm_data = sio.loadmat('res/svm.mat')
+    nn_data = sio.loadmat('res/nn.mat')
+    pytorch_data = sio.loadmat('res/pytorch.mat')
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.3, random_state=22)
+    X_cv, X_test, y_cv, y_test = train_test_split(
+        X_test, y_test, test_size=0.5, random_state=22)
+
+    print('Logistic Regression')
+    w = np.zeros(X.shape[1] + 1)
+    b = 1
+    X_train = np.hstack((np.ones((X_train.shape[0], 1)), X_train))
+    best_params = lr_data['best_params'][0]
+    w, b, _, _ = Logic_Regression_Trainer.gradient_descent(
+        X_train, y_train, w, b, Logic_Regression_Trainer.compute_cost_reg, Logic_Regression_Trainer.compute_gradient_reg, best_params[0], 1000, best_params[1])
+
+    train_score = Logic_Regression_Trainer.predict_check(
+        X_train, y_train, w, b)
+    print(f'Train score: {train_score}')
+    X_cv = np.hstack((np.ones((X_cv.shape[0], 1)), X_cv))
+    cv_score = Logic_Regression_Trainer.predict_check(X_cv, y_cv, w, b)
+    print(f'CV score: {cv_score}')
+    X_test = np.hstack((np.ones((X_test.shape[0], 1)), X_test))
+    test_score = Logic_Regression_Trainer.predict_check(X_test, y_test, w, b)
+    print(f'Test score: {test_score}')
+
+    print('SVM')
+    best_params = svm_data['best_params'][0]
+    svm_gauss = svm.SVC(
+        kernel='rbf', C=best_params[0], gamma=1/(2*best_params[1]**2))
+    svm_gauss.fit(X_train, y_train.ravel())
+
+    test_score = svm_gauss.score(X_test, y_test)
+    cv_score = svm_gauss.score(X_cv, y_cv)
+    train_score = svm_gauss.score(X_train, y_train)
+    print(f'Test score: {test_score}')
+    print(f'CV score: {cv_score}')
+    print(f'Train score: {train_score}')
+
+    print('Pytorch')
+    best_params = pytorch_data['best_params'][0]
+    criterion = nn.CrossEntropyLoss().to(device)
+    model = ComplexModel(X_train.shape[1])
+    optimizer = optim.Adam(model.parameters(), lr=best_params[1],
+                           weight_decay=best_params[0])
+    train_dl = train_data(X_train, y_train)
+    model = train_model(model, train_dl, criterion, optimizer, 20)
+
+    test_score = pred_check(
+        model(torch.tensor(X_test, dtype=torch.float).to(device)), y_test)
+    cv_score = pred_check(
+        model(torch.tensor(X_cv, dtype=torch.float).to(device)), y_cv)
+    train_score = pred_check(
+        model(torch.tensor(X_train, dtype=torch.float).to(device)), y_train)
+
+    print(f'Test score: {test_score}')
+    print(f'CV score: {cv_score}')
+    print(f'Train score: {train_score}')
+
+    print('NN')
+    best_params = nn_data['best_params'][0]
+    input_layer_size = X.shape[1]
+    hidden_layer_size = 125
+    num_labels = 2
+    yA = [0 if i == 1 else 1 for i in y_train]
+    yB = [1 if i == 1 else 0 for i in y_train]
+    y_encoded = np.array([yA, yB]).T
+    theta1 = np.random.rand(hidden_layer_size, input_layer_size + 1)
+    theta2 = np.random.rand(num_labels, hidden_layer_size + 1)
+    _, _, _, theta1, theta2, nn_trainer.train_model(X_train, y_encoded, theta1,
+                                                    theta2, best_params[0], best_params[1], 1000)
+    yA = [0 if i == 1 else 1 for i in y_test]
+    yB = [1 if i == 1 else 0 for i in y_test]
+    y_encoded = np.array([yA, yB]).T
+    nn_score = nn_trainer.predict_check(X_test, y_encoded, theta1, theta2)
+    print(f'Test score: {nn_score}')
+    yA = [0 if i == 1 else 1 for i in y_cv]
+    yB = [1 if i == 1 else 0 for i in y_cv]
+    y_encoded = np.array([yA, yB]).T
+    nn_score = nn_trainer.predict_check(X_cv, y_encoded, theta1, theta2)
+    print(f'CV score: {nn_score}')
+    yA = [0 if i == 1 else 1 for i in y_train]
+    yB = [1 if i == 1 else 0 for i in y_train]
+    y_encoded = np.array([yA, yB]).T
+    nn_score = nn_trainer.predict_check(X_train, y_encoded, theta1, theta2)
+    print(f'Train score: {nn_score}')
+
+
 def main() -> None:
     apartado_A()
-    apartado_B()
+    # apartado_B()
+    Pruebas()
 
 
 if __name__ == '__main__':

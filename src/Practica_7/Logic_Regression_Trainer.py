@@ -184,6 +184,37 @@ def predict_check(X, Z, w, b) -> float:
     return np.sum(p == Z) / Z.shape[0]
 
 
+def sigmoid(z: np.ndarray) -> np.ndarray:
+    """
+    Compute the sigmoid of z
+
+    Args:
+        z (ndarray): A scalar, numpy array of any size.
+
+    Returns:
+        g (ndarray): sigmoid(z), with the same shape as z
+
+    """
+
+    g = 1/(1+np.exp(-z))
+
+    return g
+
+
+def function(x: np.ndarray, w: np.ndarray, b: float) -> np.ndarray:
+    """Function using ''sigmoid'' to calculate the value of y to the given x, w and b
+
+    Args:
+        x (np.ndarray): X data
+        w (np.ndarray): w data
+        b (float): b data
+
+    Returns:
+        np.ndarray: final value after the sigmoid
+    """
+    return sigmoid(np.dot(x, w) + b)
+
+
 def train_model(X: np.ndarray, y: np.ndarray, x_cv: np.ndarray, y_cv: np.ndarray, alpha: float, lambda_: float, num_iters: int) -> tuple[float, float, float]:
     """Train the model with the given parameters
     Args:

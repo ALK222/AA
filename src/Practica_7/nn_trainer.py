@@ -207,7 +207,7 @@ def gradient_descent(X: np.ndarray, y: np.ndarray, theta1: np.ndarray, theta2: n
 
 
 def train_model(X, y, x_cv, y_cv, alpha, lambda_, num_iters):
-    start = time.time()
+    # start = time.time()
     print(f'Alpha: {alpha} Lambda: {lambda_}')
     input_layer_size = X.shape[1]
     hidden_layer_size = 125
@@ -223,7 +223,7 @@ def train_model(X, y, x_cv, y_cv, alpha, lambda_, num_iters):
         X, y_encoded, theta1, theta2, alpha, lambda_, num_iters)
 
     score = predict_percentage(x_cv, y_cv, theta1, theta2)
-    time = time.time() - start
+    # time = time.time() - start
     return (alpha, lambda_, score, theta1, theta2)
 
 
