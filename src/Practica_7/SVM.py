@@ -369,28 +369,28 @@ def Pruebas():
 
     print('NN')
     best_params = nn_data['best_params'][0]
-    input_layer_size = X.shape[1]
+    input_layer_size = X_train.shape[1]
     hidden_layer_size = 125
     num_labels = 2
-
     theta1 = np.random.rand(hidden_layer_size, input_layer_size + 1)
     theta2 = np.random.rand(num_labels, hidden_layer_size + 1)
-    _, _, _, theta1, theta2, nn_trainer.train_model(X_train, y_train, theta1,
-                                                    theta2, best_params[0], best_params[1], 1000)
-    yA = [0 if i == 1 else 1 for i in y_test]
-    yB = [1 if i == 1 else 0 for i in y_test]
-    y_encoded = np.array([yA, yB]).T
-    nn_score = nn_trainer.predict_check(X_test, y_encoded, theta1, theta2)
-    print(f'Test score: {nn_score}')
-    yA = [0 if i == 1 else 1 for i in y_cv]
-    yB = [1 if i == 1 else 0 for i in y_cv]
-    y_encoded = np.array([yA, yB]).T
-    nn_score = nn_trainer.predict_check(X_cv, y_encoded, theta1, theta2)
-    print(f'CV score: {nn_score}')
     yA = [0 if i == 1 else 1 for i in y_train]
     yB = [1 if i == 1 else 0 for i in y_train]
-    y_encoded = np.array([yA, yB]).T
-    nn_score = nn_trainer.predict_check(X_train, y_encoded, theta1, theta2)
+    y_train_encoded = np.array([yA, yB]).T
+
+    yA = [0 if i == 1 else 1 for i in y_cv]
+    yB = [1 if i == 1 else 0 for i in y_cv]
+    y_cv_encoded = np.array([yA, yB]).T
+
+    _, _, _, theta1, theta2, nn_trainer.train_model(X_train, y_train_encoded, X_cv,
+                                                    y_cv, best_params[0], best_params[1], 10, theta1, theta2)
+
+    nn_score = nn_trainer.predict_percentage(X_test, y_test, theta1, theta2)
+    print(f'Test score: {nn_score}')
+
+    nn_score = nn_trainer.predict_percentage(X_cv, y_cv, theta1, theta2)
+    print(f'CV score: {nn_score}')
+    nn_score = nn_trainer.predict_percentage(X_train, y_train, theta1, theta2)
     print(f'Train score: {nn_score}')
 
 

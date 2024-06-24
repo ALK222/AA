@@ -206,24 +206,28 @@ def gradient_descent(X: np.ndarray, y: np.ndarray, theta1: np.ndarray, theta2: n
     return theta1, theta2, J_history
 
 
-def train_model(X, y, x_cv, y_cv, alpha, lambda_, num_iters):
-    # start = time.time()
-    print(f'Alpha: {alpha} Lambda: {lambda_}')
-    input_layer_size = X.shape[1]
-    hidden_layer_size = 125
-    num_labels = 2
-    yA = [0 if i == 1 else 1 for i in y]
-    yB = [1 if i == 1 else 0 for i in y]
-    y_encoded = np.array([yA, yB]).T
+def train_model(X: np.ndarray, y: np.ndarray, x_cv: np.ndarray, y_cv: np.ndarray, alpha: float, lambda_: float, num_iters: int, theta1: np.ndarray, theta2: np.ndarray) -> tuple[float, float, float, np.ndarray, np.ndarray]:
+    """Trains a model with the given parameters
 
-    theta1 = np.random.rand(hidden_layer_size, input_layer_size + 1)
-    theta2 = np.random.rand(num_labels, hidden_layer_size + 1)
+    Args:
+        X (np.ndarray): Train data
+        y (np.ndarray): Expected labels in one hot encoding
+        x_cv (np.ndarray): Cross validation data
+        y_cv (np.ndarray): Expected labels not in one hot encoding
+        alpha (float): learning rate
+        lambda_ (float): regularization parameter
+        num_iters (int): number of iterations to run
+        theta1 (np.ndarray): initial weights for the first layer
+        theta2 (np.ndarray): initial weights for the second layer
+    Returns:
+        tuple(float, float, float, np.ndarray, np.ndarray): tuple with the best alpha, lambda, score, theta1 and theta2
+    """
+    print(f'Alpha: {alpha} Lambda: {lambda_}')
 
     theta1, theta2, J_history = gradient_descent(
-        X, y_encoded, theta1, theta2, alpha, lambda_, num_iters)
+        X, y, theta1, theta2, alpha, lambda_, num_iters)
 
     score = predict_percentage(x_cv, y_cv, theta1, theta2)
-    # time = time.time() - start
     return (alpha, lambda_, score, theta1, theta2)
 
 
